@@ -1,0 +1,10 @@
+actions:
+  - name: Request Page (jobiq.request.selenium.soup)
+    url: http://www.google.com
+  - name: Get Description (jobiq.extract.soup_fields)
+    fields:
+      - selector: h1
+        target_field: title
+        type: text
+  - name: Log (jobiq.log)
+    text: 🚀 Title ${title}

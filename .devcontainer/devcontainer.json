@@ -1,0 +1,8 @@
+{
+  "name": "Selenium Xvfb Chromium",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "runArgs": ["--platform", "linux/x86_64"],
+  "postCreateCommand": "bash /entrypoint.sh "
+}

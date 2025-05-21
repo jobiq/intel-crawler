@@ -1,0 +1,71 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "📁 Python: Current File",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true,
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}",
+        "TOKENIZERS_PARALLELISM": "true"
+      }
+    },
+    {
+      "name": "📁 Python: Current File with profiler",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "cProfile",
+      "args": ["-o", "/tmp/tmp.prof", "${file}"]
+    },
+    {
+      "name": "🚀 Pipeline",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "scrape",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "args": [
+        "-s",
+        "1",
+        "-p",
+        "{\"pages\": 10 }"
+        // "{\"roles\": false, \"degrees\": true, \"subjects\": true, \"days\": 90 }"
+        // "{\"skill_frameworks\": [\"asf\"], \"role_frameworks\": [\"anzsco\"] }"
+        // "{\"skill_frameworks\": [\"asf\"], \"skill_threshold\": 0.4, \"role_frameworks\": [\"anzsco\"], \"pages\": 1, \"startPage\": 0, \"roles\": false, \"degrees\": false }"
+      ], // ["-p", "10", "-s", "3"], //, "-w", "10"],
+      "justMyCode": true
+    },
+    {
+      "name": "🔧 Fix Errors",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "scrape",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "args": [
+        "-s",
+        "2",
+        "-p",
+        "{\"filter\": \"\", \"scraper_id\": 1 }"
+        // "{\"roles\": false, \"degrees\": true, \"subjects\": true, \"days\": 90 }"
+        // "{\"skill_frameworks\": [\"asf\"], \"role_frameworks\": [\"anzsco\"] }"
+        // "{\"skill_frameworks\": [\"asf\"], \"skill_threshold\": 0.4, \"role_frameworks\": [\"anzsco\"], \"pages\": 1, \"startPage\": 0, \"roles\": false, \"degrees\": false }"
+      ], // ["-p", "10", "-s", "3"], //, "-w", "10"],
+      "justMyCode": true
+    },
+    {
+      "name": "🤖 Manager: Launch",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "main"
+    }
+  ]
+}

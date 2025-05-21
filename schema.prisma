@@ -1,0 +1,214 @@
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = "-1"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL1")
+}
+
+enum JobStatus {
+  Info
+  Processed
+  Error
+  Warning
+}
+
+model ProcessedJob {
+  id      Int        @id @default(autoincrement())
+  region  String?
+  jobId   String
+  data    String     @db.Text
+  date    DateTime
+  scraper Int        @default(2)
+  message String?
+  status  JobStatus?
+
+  @@index([jobId])
+}
+
+enum SalaryPeriod {
+  HOUR
+  DAY
+  WEEK
+  FORTNIGHT
+  MONTH
+  YEAR
+}
+
+model Job {
+  city           String?
+  country        String?
+  educationLevel String?
+  createdDate    DateTime?
+  domain         String?       @db.VarChar(512)
+  domainId       String?
+  employerId     Int
+  expiryDate     DateTime?
+  id             Int           @id @default(autoincrement())
+  industryId     Int
+  intermediary   String?       @db.VarChar(512)
+  jobId          String        @unique
+  // jobType        String?       @db.VarChar(512)
+  logo           String
+  maxSalary      Float?
+  minSalary      Float?
+  salaryPeriod   SalaryPeriod?
+  postCode       String
+  region         String?
+  state          String?
+  text           String        @db.Text
+  title          String        @db.VarChar(512)
+  url            String        @db.VarChar(1024)
+  Skills         JobSkill[]
+  Roles          JobRoles[]
+  minBonus       Float?
+  maxBonus       Float?
+  remote         Boolean?
+  minExperience  String?
+  maxExperience  String?
+  education      String?
+  scraperId      Int           @default(2)
+  scrapedDate    DateTime      @default(now())
+  salaryCurrency String?       @default("AUD")
+  Employer       Employer      @relation(fields: [employerId], references: [id])
+  Industry       Industry      @relation(fields: [industryId], references: [id])
+
+  @@index([jobId])
+}
+
+model Employer {
+  id          Int     @id @default(autoincrement())
+  webId       String
+  scraperId   Int
+  name        String
+  country     String?
+  website     String? @db.VarChar(1024)
+  size        String?
+  facebook    String?
+  twitter     String?
+  phone       String?
+  description String? @db.Text
+  Job         Job[]
+}
+
+model JobRoles {
+  jobId    Int
+  familyId String
+  roleId   Int
+  Job      Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  Role     JobRole @relation(fields: [roleId, familyId], references: [id, familyId], onDelete: Cascade)
+
+  @@id([jobId, familyId, roleId])
+}
+
+model JobSkill {
+  skillFamilyId String
+  jobId         Int
+  skillId       Int
+  Job           Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  Skill         Skill  @relation(fields: [skillId, skillFamilyId], references: [id, familyId], onDelete: Cascade)
+
+  @@id([jobId, skillId, skillFamilyId])
+}
+
+model Skill {
+  id               Int        @default(autoincrement())
+  // originalId       String∏
+  // description      String     @db.Text
+  type             String     @default("skill")
+  familyId         String
+  name             String
+  alternativeNames String[]
+  // embeddings       String     @db.Text
+  // relations        String     @db.Text
+  leaf             Boolean    @default(true)
+  // multiplier       Float
+  parentSkillId    Int?
+  Parent           Skill?     @relation("ParentSkill", fields: [parentSkillId, familyId], references: [id, familyId], onDelete: Cascade)
+  Children         Skill[]    @relation("ParentSkill")
+  JobSkill         JobSkill[]
+
+  @@id([id, familyId])
+  @@index([name])
+  @@index([alternativeNames])
+}
+
+model JobRole {
+  familyId         String
+  id               Int        @default(autoincrement())
+  industryId       Int
+  alternativeNames String[]
+  name             String     @default("")
+  description      String?    @db.Text
+  embeddings       String?    @db.Text
+  parentId         Int?
+  Parent           JobRole?   @relation("ParentRole", fields: [parentId, familyId], references: [id, familyId], onDelete: Cascade)
+  Children         JobRole[]  @relation("ParentRole")
+  Jobs             JobRoles[]
+  Industry         Industry   @relation(fields: [industryId], references: [id], onDelete: Cascade)
+
+  @@id([id, familyId])
+  @@index([name])
+  @@index([alternativeNames])
+}
+
+enum ScraperType {
+  Job
+  Content
+  MicroCredentials
+  Process
+}
+
+model Scraper {
+  id             Int          @id @default(autoincrement())
+  name           String
+  source         String       @default("")
+  type           ScraperType
+  Runs           ScraperRun[]
+  url            String?
+  logo           String?
+  schedule       Json?
+  propertySchema Json?
+  active         Boolean      @default(true)
+}
+
+enum ScraperRunStatus {
+  Idle
+  Running
+  Paused
+  Success
+  Fail
+  Aborted
+}
+
+model ScraperRun {
+  id        Int              @id @default(autoincrement())
+  scraperId Int
+  Scraper   Scraper          @relation(fields: [scraperId], references: [id])
+  start     DateTime
+  finish    DateTime?
+  status    ScraperRunStatus
+  message   String
+  report    Json
+  log       String           @db.Text
+  succeeded Int
+  failed    Int
+  skipped   Int
+  existing  Int              @default(0)
+  day       String           @default("*")
+  hour      Int              @default(0)
+  minute    Int              @default(0)
+}
+
+model Industry {
+  id               Int       @default(autoincrement())
+  name             String
+  alternativeNames String[]
+  Job              Job[]
+  Roles            JobRole[]
+
+  @@id([id])
+  @@index([alternativeNames])
+}

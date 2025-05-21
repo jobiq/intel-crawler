@@ -1,0 +1,11 @@
+name: google
+source: google.content.yaml
+logo: ""
+propertySchema:
+  type: object
+  properties:
+    pages:
+      type: int
+schedule:
+type: Job
+url: ""

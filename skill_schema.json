@@ -1,0 +1,112 @@
+{
+  "type": "object",
+  "properties": {
+    "job_titles": {
+      "type": "array",
+      "description": "The alternative titles for this job",
+      "items": {
+        "type": "string",
+        "description": "An alternative title for this job"
+      }
+    },
+    "industry": {
+      "type": "string",
+      "description": "The industry this job belongs to. For example, 'Information Technology'."
+    },
+    "education": {
+      "type": "string",
+      "description": "The education level required for this job. For example, 'Bachelor's degree'."
+    },
+    "core_competencies": {
+      "type": "array",
+      "description": "Find the core competencies that this job requires. Do not assume skills, only base them on requirements in the job description. Core competencies are skills that are common to all jobs such as ‘teamwork’ or ‘problem solving’. They are sometimes known as ‘foundation skills’ or ‘employability skills’. The core competencies in the Australian Skills Classification align to the definitions of foundation skills typically used in the Australian VET system – specifically the Employability Skills Framework developed by the Australian Skills Quality Authority with minor differences recommended by education system experts. Try to find at least 5 covered and 3 missing, but more the better.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "competency": {
+            "type": "string",
+            "description": "The name of the competency."
+          },
+          "level": {
+            "type": "string",
+            "description": "The level of expertise acquired. Use 1 for beginner, being able to follow instructions. 2 for intermediate, being able to work independently and apply skill to new problems. 3 for master, being able to work independently, educate others and lead activities requiring this skill. 4 for influence, where the individual is an empowering leader, influences innovation, and inspires collaboration to advance cross-functional interactions of areas of expertise and/or competencies",
+            "enum": ["1", "2", "3", "4"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["required", "optional", "assumed"],
+            "description": "required: this skill is specifically mentioned or implied in the job ad as required. optional: this skill is specifically mentioned or implied as optional or bonus in the job ad. assumed: this skill is not mentioned in the job ad but it is strongly assumed as beneficial for this job role"
+          },
+          "cluster": {
+            "type": "string",
+            "description": "What is the topmost cluster this competency belongs to? For example, 'Interpersonal Skills'."
+          }
+        },
+        "required": ["competency", "level", "cluster", "status"]
+      }
+    },
+    "specialist_tasks": {
+      "type": "array",
+      "description": "Which specialist tasks are required by the job? Try to find at least 15 skills. Do not assume skills, only base them on requirements in the job description. Specialist tasks these are the activities that describe day-to-day work in a job – for example ‘preparing financial documents’ or ‘giving immunisations’. While specialist tasks can be transferrable across occupations and sectors, they are not universal - unlike core competencies. As such, specialist tasks are useful for differentiating occupations. Specialist tasks change more frequently than core competencies, making it possible to identify trends. This information adds to our understanding of how jobs may be changing in response to factors like increased digitisation or changing business models. Industry and employers can use the specialist tasks to define critical skills and identify skill gaps that could be met by learning on the job, short courses or accelerated training. Try to find at least 5 covered and 3 missing, but more the better.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "type": "string",
+            "description": "The name of the soft task."
+          },
+          "level": {
+            "type": "string",
+            "description": "The level of expertise acquired. Use 1 for beginner, being able to follow instructions. 2 for intermediate, being able to work independently and apply skill to new problems. 3 for master, being able to work independently, educate others and lead activities requiring this skill. 4 for influence, where the individual is an empowering leader, influences innovation, and inspires collaboration to advance cross-functional interactions of areas of expertise and/or competencies",
+            "enum": ["1", "2", "3", "4"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["required", "optional", "assumed"],
+            "description": "required: this skill is specifically mentioned or implied in the job ad as required. optional: this skill is specifically mentioned or implied as optional or bonus in the job ad. assumed: this skill is not mentioned in the job ad but it is strongly assumed as beneficial for this job role"
+          },
+          "cluster": {
+            "type": "string",
+            "description": "What would be highest level cluster this task would belong to. Think of cluster as a group of tasks that are related to each other. For example, 'Programming'. A cluster should include at least 10 to 15 different skills"
+          }
+        },
+        "required": ["task", "level", "status", "cluster"]
+      }
+    },
+    "technology_tools": {
+      "type": "array",
+      "description": "Extract all technology tools are required by the job? Try to extract at least 5 tools. Do not assume tools, only base them on requirements in the job description. Technology tools are the software and hardware used in occupations – for example ‘graphics or photo imaging software’. The technology tools describe software and equipment types or categories and provide specific packages or products as examples. Understanding the technology tools required in occupations, and how these are changing, can help inform decisions about training, up-skilling and re-skilling, or how to take advantage of emerging technologies across different fields and industries. Try to find at least 5 covered and 3 missing, but more the better.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tool": {
+            "type": "string",
+            "description": "The name of the tool."
+          },
+          "level": {
+            "type": "string",
+            "description": "The level of expertise acquired. Use 1 for beginner, being able to follow instructions. 2 for intermediate, being able to work independently and apply skill to new problems. 3 for master, being able to work independently, educate others and lead activities requiring this skill. 4 for influence, where the individual is an empowering leader, influences innovation, and inspires collaboration to advance cross-functional interactions of areas of expertise and/or competencies",
+            "enum": ["1", "2", "3", "4"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["required", "optional", "assumed"],
+            "description": "required: this skill is specifically mentioned or implied in the job ad as required. optional: this skill is specifically mentioned or implied as optional or bonus in the job ad. assumed: this skill is not mentioned in the job ad but it is strongly assumed as beneficial for this job role"
+          },
+          "cluster": {
+            "type": "string",
+            "description": "What would be highest level cluster this tool would belong to. Think of cluster as a group of tools that are related to each other. For example, 'Office Software', or 'Graphic Software'. A cluster should include at least 10 to 15 different tools"
+          }
+        },
+        "required": ["tool", "level", "cluster", "status"]
+      }
+    }
+  },
+  "required": [
+    "core_competencies",
+    "specialist_tasks",
+    "job_titles",
+    "industry",
+    "education"
+  ]
+}
