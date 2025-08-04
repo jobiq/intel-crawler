@@ -85,19 +85,19 @@ class ParseSkills(ScraperAction[CustomConfig]):
                 "parentId": cluster.id,
                 "industryId":  industry.id
             })    
-        else:
-            alternative_names = [*role.alternativeNames]
-            for title in jobs["titles"]:
-                if title != role.name and title not in alternative_names:
-                    alternative_names.append(title)
+        # else:
+        #     alternative_names = [*role.alternativeNames]
+        #     for title in jobs["titles"]:
+        #         if title != role.name and title not in alternative_names:
+        #             alternative_names.append(title)
             
-            if len(alternative_names) != len(role.alternativeNames):
-                await prisma.jobrole.update(
-                    where={"id_familyId": {
-                        "id": role.id, "familyId": FAMILY
-                    }},
-                    data={"alternativeNames": alternative_names}
-                )
+        #     if len(alternative_names) != len(role.alternativeNames):
+        #         await prisma.jobrole.update(
+        #             where={"id_familyId": {
+        #                 "id": role.id, "familyId": FAMILY
+        #             }},
+        #             data={"alternativeNames": alternative_names}
+        #         )
 
         return role
 
