@@ -14,6 +14,8 @@ from typing_extensions import NotRequired, TypedDict
 
 from scraper.exception import ScraperException
 from html_to_markdown import convert_to_markdown
+import time
+import random
 
 
 def perfect_string(text: str):
@@ -54,14 +56,26 @@ def fetch_graphql(url: str, query: str, variables: Any):
 
 
 def fetch_json(url: str):
-    # store the response of URL
-    response = requests.get(url)
+    retries = 0
 
-    # storing the JSON response
-    # from url in data
-    data_json = response.json()
+    while retries < 5:
+        try:
+            # store the response of URL
+            response = requests.get(url)
 
-    return data_json
+            # storing the JSON response
+            # from url in data
+            data_json = response.json()
+
+            return data_json
+        except Exception as e:
+            print(f"❌  Error fetching JSON from {url}: {e}, retrying... ({retries + 1}/5)")
+            retries += 1
+            if retries >= 5:
+                raise ScraperException(
+                  "error", f"Failed to fetch JSON from {url} after multiple attempts")
+            time.sleep(random.uniform(3, 60))
+
 
 
 def post_json(url: str, body: Any):

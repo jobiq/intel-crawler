@@ -26,6 +26,12 @@ First, we need to build the container, please change the name `jobiq-intel` to w
 docker build --platform=linux/amd64 -t jobiq-intel .
 ```
 
+for scraper make sure to modify the entrypoint.sh
+
+```bash
+docker build --platform=linux/amd64 -t jobiq-scraper .
+```
+
 ### 3. Prepare Scrapers
 
 You need to define your first scraper to start scraping. The scraper stores the scraper data in the database, but you can easily load it. For this, you will need two files in the root of your project:
@@ -305,6 +311,26 @@ actions:
   - name: Merge Sub Processes (jobiq.multiprocessing.merge)
 ```
 
+# Running multiple docker instances
+
+Make sure you build the image "jobiq-scraper".
+Then, you can use this "./run_parallel_scraping.sh <num_containers> <pages_per_container>"
+
 # Contact
 
 If you have any questions please let us know at `admin@jobiq.com.au`
+
+# TMUX
+
+## Usage:
+Tmux Controls:
+Detach: Ctrl+B, then D (to run in background)
+Reattach: tmux attach -t <session_name>
+Kill session: tmux kill-session -t <session_name>
+Navigate panes: Ctrl+B, then arrow keys
+
+## Examples:
+4 containers: Creates a 2x2 grid
+6 containers: Creates a 2x3 grid
+9 containers: Creates a 3x3 grid
+10 containers: Creates a 3x4 grid (10 panes, 2 empty)
