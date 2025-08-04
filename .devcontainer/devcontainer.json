@@ -3,6 +3,7 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "image": "jobiq-dev-image",
   "runArgs": ["--platform", "linux/x86_64"],
   "postCreateCommand": "bash /entrypoint.sh "
 }

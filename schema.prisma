@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL1")
+  url      = env("DATABASE_URL")
 }
 
 enum JobStatus {
@@ -38,42 +38,42 @@ enum SalaryPeriod {
 }
 
 model Job {
+  // jobType        String?       @db.VarChar(512)
   city           String?
   country        String?
-  educationLevel String?
   createdDate    DateTime?
   domain         String?       @db.VarChar(512)
   domainId       String?
+  education      String?
+  educationLevel String?
+  Employer       Employer      @relation(fields: [employerId], references: [id])
   employerId     Int
   expiryDate     DateTime?
   id             Int           @id @default(autoincrement())
+  Industry       Industry      @relation(fields: [industryId], references: [id])
   industryId     Int
   intermediary   String?       @db.VarChar(512)
   jobId          String        @unique
-  // jobType        String?       @db.VarChar(512)
   logo           String
+  maxBonus       Float?
+  maxExperience  String?
   maxSalary      Float?
+  minBonus       Float?
+  minExperience  String?
   minSalary      Float?
-  salaryPeriod   SalaryPeriod?
   postCode       String
   region         String?
+  remote         Boolean?
+  Roles          JobRoles[]
+  salaryCurrency String?       @default("AUD")
+  salaryPeriod   SalaryPeriod?
+  scrapedDate    DateTime      @default(now())
+  scraperId      Int           @default(2)
+  Skills         JobSkill[]
   state          String?
   text           String        @db.Text
   title          String        @db.VarChar(512)
   url            String        @db.VarChar(1024)
-  Skills         JobSkill[]
-  Roles          JobRoles[]
-  minBonus       Float?
-  maxBonus       Float?
-  remote         Boolean?
-  minExperience  String?
-  maxExperience  String?
-  education      String?
-  scraperId      Int           @default(2)
-  scrapedDate    DateTime      @default(now())
-  salaryCurrency String?       @default("AUD")
-  Employer       Employer      @relation(fields: [employerId], references: [id])
-  Industry       Industry      @relation(fields: [industryId], references: [id])
 
   @@index([jobId])
 }

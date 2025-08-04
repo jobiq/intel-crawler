@@ -39,7 +39,7 @@ class SaveJob(ScraperAction[Any]):
             "employerId": employer_id,
             "intermediary": item["intermediary"] if "intermediary" in item else None,
             "industryId": 0,
-            "jobId": item["jobId"],
+            "jobId": str(item["jobId"]),
             # "jobType": item["jobType"] if "jobType" in item else None,
             "postCode": item["postCode"] if "postCode" in item else "",
             # "industryCode": item["industryCode"] if "industryCode" in item else "",

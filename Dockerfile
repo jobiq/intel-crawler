@@ -115,7 +115,7 @@ RUN pip install -r requirements.txt
 
 # Install Node deps and generate Prisma client
 
-RUN prisma db push
+# RUN prisma db push
 RUN prisma generate
 
 # Expose the app port

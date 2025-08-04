@@ -1,10 +1,14 @@
 import asyncio
-import getopt
+import getopt 
 import json
 import sys
 from typing import Any, Dict, List
 
 from scraper.queue import ScraperQueue
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
 
 DEFAULT_START = "{}"
 
@@ -14,31 +18,40 @@ async def do_the_job(properties: Dict[str, Any], queue: ScraperQueue, scrapers: 
         await queue.start_scraper(scraper, properties, False)
 
 
+help = "python -m scrape --pages <pages> --props <properties> --workers <worker_count> -s <scraper_ids>"
+
 def main(argv: Any):
     properties = DEFAULT_START
+    workers = 1
     scrapers = []
-
-    queue = ScraperQueue(num_workers=1)
   
     try:
         opts, _ = getopt.getopt(
-            argv, "hp:s:", ["pages=", "scrapers="])
+            argv, "hp:s:p:w:", ["pages=", "scrapers=", "workers="])
     except getopt.GetoptError:
-        print("python pipelines -p <properties> -s <scraper_ids>")
+        print(help)
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-h":
-            print(
-                "python pipelines -p <properties> -s <scraper_ids>")
+            print(help)
             sys.exit()
         elif opt in ("-p", "--properties"):
             properties = arg
+        elif opt in ("-w", "--workers"):
+            workers = int(arg)
+            if workers < 1:
+                print("Number of workers must be at least 1.")
+                sys.exit(2)
+        elif opt in ("-g", "--pages"):
+            properties = "{\"pages\": " + arg + "}"
         elif opt in ("-s", "--scrapers"):
             scraper_ids = arg.split(",")
             # queue.add_listener(lambda x, y: print(
             #     f"{x.value}: {y['message'] if 'message' in y else ''}"))
 
             scrapers = [int(x) for x in scraper_ids]
+
+    queue = ScraperQueue(num_workers=workers)
 
     asyncio.run(do_the_job(json.loads(properties), queue, scrapers))
     queue.worker_manager.stop()

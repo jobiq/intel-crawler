@@ -34,6 +34,8 @@
       "args": [
         "-s",
         "1",
+        "-w",
+        "1",
         "-p",
         "{\"pages\": 10 }"
         // "{\"roles\": false, \"degrees\": true, \"subjects\": true, \"days\": 90 }"
