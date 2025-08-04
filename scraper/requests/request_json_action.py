@@ -11,6 +11,7 @@ class CustomConfig(ScraperActionConfig):
     url: str
     target_field: str
     url_field: NotRequired[str]
+    validation: NotRequired[str] = None
 
 
 class RequestJsonAction(ScraperAction[CustomConfig]):
@@ -18,12 +19,13 @@ class RequestJsonAction(ScraperAction[CustomConfig]):
 
     async def init(self):
         self.url = self.config["url"]
+        self.validation = self.config["validation"] if "validation" in self.config else None
 
     async def _execute(self, scraper: ScraperItem):
         # process url
         url = scraper.parse_string(self.url)
 
-        data = fetch_json(url)
+        data = fetch_json(url, self.validation)
 
         scraper.url = url
         scraper.source = data

@@ -55,7 +55,7 @@ def fetch_graphql(url: str, query: str, variables: Any):
     return data_json
 
 
-def fetch_json(url: str):
+def fetch_json(url: str, validation: str | None = None):
     retries = 0
 
     while retries < 5:
@@ -66,6 +66,18 @@ def fetch_json(url: str):
             # storing the JSON response
             # from url in data
             data_json = response.json()
+
+            if validation:
+                if validation == "array:not_empty":
+                    if not isinstance(data_json, list) or len(data_json) == 0:
+                        raise ScraperException(
+                            "error", f"Validation failed for {url}: Expected non-empty array, got {data_json}")
+                
+                if "field:" in validation:
+                    field = validation.split(":")[1].strip()
+                    if not isinstance(data_json, dict) or field not in data_json:
+                        raise ScraperException(
+                            "error", f"Validation failed for {url}: Expected field '{field}' in {data_json}")
 
             return data_json
         except Exception as e:
