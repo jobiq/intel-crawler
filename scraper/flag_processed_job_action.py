@@ -5,6 +5,7 @@ from api.db import connect
 from scraper.helpers import current_date
 from scraper.action import ScraperAction, ScraperItem
 from scraper.exception import ScraperException
+from prisma.enums import JobStatus
 
 class FlagProcessedJob(ScraperAction[Any]):
     uid = "jobiq.check_processed_job"
@@ -44,6 +45,8 @@ class FlagProcessedJob(ScraperAction[Any]):
                     scraper.resolve(
                         self.source_field) if self.source_field is not None else scraper.item
                 ),
+                "status": JobStatus.Info,
+                "message": "To be processed",
                 "date": current_date(),
                 "scraper": scraper.context.scraper.id,
                 "jobId": str(id)

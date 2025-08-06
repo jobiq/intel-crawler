@@ -65,8 +65,8 @@ class SaveJob(ScraperAction[Any]):
             "text": item["description"] if "description" in item else item["text"] if "text" in item else "",
             "title": item["title"] if "title" in item else "",
             "url": scraper.url,
-            "Skills": {"create": item["Skills"]["Skills"]},
-            "Roles": {"create": item["Skills"]["Role"]},
+            # "Skills": {"create": item["Skills"]["Skills"]},
+            # "Roles": {"create": item["Skills"]["Role"]},
             "scraperId": scraper.context.scraper.id,
             "scrapedDate": current_date()
         })

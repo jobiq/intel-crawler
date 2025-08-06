@@ -24,6 +24,7 @@ scrapers/scraper/definitions
 *.css
 *.js
 *.zip
+*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
