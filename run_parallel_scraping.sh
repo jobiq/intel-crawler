@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Script to run N docker containers for M pages in parallel with tiled display
-# Usage: ./run_parallel_scraping.sh <num_containers> <pages_per_container>
-# Example: ./run_parallel_scraping.sh 4 10
+# Usage: ./run_parallel_scraping.sh <scraper_id> <num_containers> <pages_per_container> [start_page]
+# Example: ./run_parallel_scraping.sh 1 4 10
+# Example: ./run_parallel_scraping.sh 2 4 10 50
 # Requires: tmux
 
 set -e
@@ -15,9 +16,10 @@ if ! command -v tmux &> /dev/null; then
 fi
 
 # Check if correct number of arguments provided
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 <num_containers> <pages_per_container>"
-    echo "Example: $0 4 10"
+if [ $# -lt 3 ] || [ $# -gt 4 ]; then
+    echo "Usage: $0 <scraper_id> <num_containers> <pages_per_container> [start_page]"
+    echo "Example: $0 1 4 10       # Use scraper_id 1, start from page 1"
+    echo "Example: $0 2 4 10 50    # Use scraper_id 2, start from page 50"
     echo "This will run 4 containers, each scraping 10 pages"
     exit 1
 fi
@@ -59,10 +61,17 @@ calculate_grid() {
     echo "$rows $cols"
 }
 
-NUM_CONTAINERS=$1
-PAGES_PER_CONTAINER=$2
+SCRAPER_ID=$1
+NUM_CONTAINERS=$2
+PAGES_PER_CONTAINER=$3
+START_PAGE=${4:-1}  # Default to 1 if not provided
 
 # Validate inputs are positive integers
+if ! [[ "$SCRAPER_ID" =~ ^[1-9][0-9]*$ ]]; then
+    echo "Error: Scraper ID must be a positive integer"
+    exit 1
+fi
+
 if ! [[ "$NUM_CONTAINERS" =~ ^[1-9][0-9]*$ ]]; then
     echo "Error: Number of containers must be a positive integer"
     exit 1
@@ -73,8 +82,16 @@ if ! [[ "$PAGES_PER_CONTAINER" =~ ^[1-9][0-9]*$ ]]; then
     exit 1
 fi
 
+if ! [[ "$START_PAGE" =~ ^[1-9][0-9]*$ ]]; then
+    echo "Error: Start page must be a positive integer"
+    exit 1
+fi
+
 echo "Starting $NUM_CONTAINERS containers, each scraping $PAGES_PER_CONTAINER pages..."
-echo "Total pages to scrape: $((NUM_CONTAINERS * PAGES_PER_CONTAINER))"
+echo "Scraper ID: $SCRAPER_ID"
+echo "Start page: $START_PAGE (all containers will start from this page)"
+echo "End page: $((START_PAGE + PAGES_PER_CONTAINER - 1)) (all containers will process up to this page)"
+echo "Total containers working together: $NUM_CONTAINERS"
 
 # Calculate grid dimensions
 read -r ROWS COLS <<< "$(calculate_grid $NUM_CONTAINERS)"
@@ -116,16 +133,18 @@ for ((i=0; i<NUM_CONTAINERS; i++)); do
     pane_id="${SESSION_NAME}:0.$i"
     
     echo "Starting container $container_num in pane $i..."
+    echo "  Container $container_num will scrape pages $START_PAGE to $((START_PAGE + PAGES_PER_CONTAINER - 1)) (working together with other containers)"
     
     # Create unique container name and log file
     CONTAINER_NAME="scraper-$container_num-$(date +%s)"
     LOG_FILE="logs/container-$container_num.log"
     
     # Send command to specific pane
-    tmux send-keys -t "$pane_id" "echo 'Container $container_num - Scraping $PAGES_PER_CONTAINER pages'" C-m
+    tmux send-keys -t "$pane_id" "echo 'Container $container_num - Scraping $PAGES_PER_CONTAINER pages starting from page $START_PAGE'" C-m
+    tmux send-keys -t "$pane_id" "echo 'Page range: $START_PAGE to $((START_PAGE + PAGES_PER_CONTAINER - 1)) (working together with other containers)'" C-m
     tmux send-keys -t "$pane_id" "echo 'Log file: $LOG_FILE'" C-m
     tmux send-keys -t "$pane_id" "echo '--- Starting Docker container ---'" C-m
-    tmux send-keys -t "$pane_id" "docker run --rm --name \"$CONTAINER_NAME\" --platform=linux/amd64 -v \"\$(pwd)\":/app -w /app jobiq-scraper python -m scrape --pages $PAGES_PER_CONTAINER --scrapers 1 2>&1 | tee \"$LOG_FILE\"" C-m
+    tmux send-keys -t "$pane_id" "docker run --rm --name \"$CONTAINER_NAME\" --platform=linux/amd64 -v \"\$(pwd)\":/app -w /app jobiq-scraper python -m scrape --pages $PAGES_PER_CONTAINER --start $START_PAGE --scrapers $SCRAPER_ID 2>&1 | tee \"$LOG_FILE\"" C-m
     
     # Small delay to avoid overwhelming the system
     sleep 0.5

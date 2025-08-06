@@ -18,7 +18,7 @@ async def do_the_job(properties: Dict[str, Any], queue: ScraperQueue, scrapers: 
         await queue.start_scraper(scraper, properties, False)
 
 
-help = "python -m scrape --pages <pages> --props <properties> --workers <worker_count> -s <scraper_ids>"
+help = "python -m scrape --pages <pages> --props <properties> --workers <worker_count> --start <start_index> -s <scraper_ids>"
 
 def main(argv: Any):
     properties = DEFAULT_START
@@ -27,29 +27,45 @@ def main(argv: Any):
   
     try:
         opts, _ = getopt.getopt(
-            argv, "hp:s:p:w:", ["pages=", "scrapers=", "workers="])
+            argv, "hp:s:p:w:t", ["pages=", "scrapers=", "workers=", "start="])
     except getopt.GetoptError:
         print(help)
         sys.exit(2)
+
+    parameters = {}
+
     for opt, arg in opts:
         if opt == "-h":
             print(help)
             sys.exit()
         elif opt in ("-p", "--properties"):
-            properties = arg
+            parsed = json.loads(arg)
+            parameters = {
+                **parameters,
+                **parsed
+            }
         elif opt in ("-w", "--workers"):
             workers = int(arg)
             if workers < 1:
                 print("Number of workers must be at least 1.")
                 sys.exit(2)
         elif opt in ("-g", "--pages"):
-            properties = "{\"pages\": " + arg + "}"
+            parameters["pages"] = int(arg)
+        elif opt in ("-t", "--start"):
+            print("Setting start index to", arg)
+            parameters["start_index"] = int(arg)
+            if parameters["start_index"] < 0:
+                print("Start index must be a positive integer.")
+                sys.exit(2)
         elif opt in ("-s", "--scrapers"):
             scraper_ids = arg.split(",")
             # queue.add_listener(lambda x, y: print(
             #     f"{x.value}: {y['message'] if 'message' in y else ''}"))
 
             scrapers = [int(x) for x in scraper_ids]
+
+    properties = json.dumps(parameters)
+    print(properties)
 
     queue = ScraperQueue(num_workers=workers)
 

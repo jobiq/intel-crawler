@@ -316,6 +316,13 @@ actions:
 Make sure you build the image "jobiq-scraper".
 Then, you can use this "./run_parallel_scraping.sh <num_containers> <pages_per_container>"
 
+or with 
+
+docker run --rm --name "jobiq-scraper" \
+ --platform=linux/amd64 \
+ -v "$(pwd)":/app -w /app jobiq-scraper \
+ python -m scrape --pages 5 --start 1 --scrapers 1
+
 # Contact
 
 If you have any questions please let us know at `admin@jobiq.com.au`

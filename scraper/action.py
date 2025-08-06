@@ -240,6 +240,12 @@ class ScraperAction(ABC, Generic[T]):
             result = self.config[name]
         elif name in self.shared_config:
             result = self.shared_config[name]
+        else:
+            try:
+                try_parse = int(name)
+                result = try_parse
+            except ValueError:
+                pass
         return result
     
     def get_bool_config(self, name: str, scraper: ScraperItem, default: bool = False) -> bool:
